@@ -14,7 +14,7 @@ module.exports.getAllProducts = async (req, res, next) => {
     const product = await db
       .collection("products")
       .find({})
-      .project({ _id: 0 })
+      // .project({ _id: 0 })
       .skip(+page * limit)
       .limit(+limit)
       .toArray();
@@ -62,6 +62,12 @@ module.exports.getProductDetail = async (req, res, next) => {
       .collection("products")
       .findOne({ _id: ObjectId(id) });
 
+    if (!product) {
+      return res
+        .status(400)
+        .json({ status: false, error: "could not find with this id." });
+    }
+
     res.status(200).json({
       success: true,
       data: product,
@@ -71,22 +77,77 @@ module.exports.getProductDetail = async (req, res, next) => {
   }
 };
 
-module.exports.updateProduct = (req, res) => {
-  const { id } = req.params;
-  // console.log(id);
-  const filter = { _id: id };
-  const newData = products.find((product) => product.id === Number(id));
+module.exports.updateProduct = async (req, res, next) => {
+  try {
+    const db = getDb();
+    const { id } = req.params;
 
-  newData.id = id;
-  newData.name = req.body.name;
+    if (!ObjectId.isValid(id)) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Not a valid product id." });
+    }
 
-  res.send(newData);
+    const product = await db
+      .collection("products")
+      .updateOne({ _id: ObjectId(id) }, { $set: req.body });
+
+    if (!product.modifiedCount) {
+      return res
+        .status(400)
+        .json({ status: false, error: "could not update the product." });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Successfully updated the product",
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-module.exports.deleteProduct = (req, res) => {
-  const { id } = req.params;
-  // console.log(id);
-  const filter = { _id: id };
-  deletedData = products.filter((product) => product.id !== Number(id));
-  res.send(deletedData);
+module.exports.deleteProduct = async (req, res, next) => {
+  try {
+    const db = getDb();
+    const { id } = req.params;
+
+    if (!ObjectId.isValid(id)) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Not a valid product id." });
+    }
+
+    const product = await db
+      .collection("products")
+      .deleteOne({ _id: ObjectId(id) });
+
+    if (!product.deletedCount) {
+      return res
+        .status(400)
+        .json({ status: false, error: "could not delete the product." });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Successfully deleted the product",
+    });
+  } catch (error) {
+    next(error);
+  }
 };
+
+// module.exports.test = async (req, res, next) => {
+//   for (let i = 0; i < 100000; i++) {
+//     const db = getDb();
+//     const result = await db
+//       .collection("test")
+//       .insertOne({ name: `test ${i}`, age: i });
+//   }
+// };
+
+// module.exports.testGet = async (req, res, next) => {
+//   const db = getDb();
+//   const result = await db.collection("test").find({ age: 99999 }).toArray();
+//   res.json(result);
+// };
