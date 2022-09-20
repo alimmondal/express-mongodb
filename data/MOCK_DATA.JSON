@@ -1,0 +1,26 @@
+[
+  {
+    "name": "HillTracts",
+    "description": "HillTracts has a good scenery",
+    "price": 5550,
+    "location": "HillTracts",
+    "travelerQuantity": 30,
+    "status": "top-viewed"
+  },
+  {
+    "name": "Jaflong",
+    "description": "Jaflong has a good fall",
+    "price": 55,
+    "location": "Jaflong",
+    "travelerQuantity": 30,
+    "status": "cheapest"
+  },
+  {
+    "name": "Cox's Bazar",
+    "description": "Cox's Bazar has the longest sea-shore",
+    "price": 55,
+    "location": "Cox's Bazar",
+    "travelerQuantity": 30,
+    "status": "top-viewed"
+  }
+]
